@@ -1,40 +1,33 @@
 
-from agent_eval_gym.environment.models import (
-    Vendor,
-    PurchaseOrder,
-    Invoice,
-    Payment,
-)
+from avg.scenarios.invoice_scenarios import create_invoice_scenario
 
 
 class EnvironmentState:
-    def __init__(self):
-        self.vendors = {
-            "V001": Vendor(
-                vendor_id="V001",
-                name="ABC Technologies",
-                active=True,
-            )
-        }
+    def __init__(self, scenario_id="S1"):
+        scenario = create_invoice_scenario(scenario_id)
 
-        self.purchase_orders = {
-            "PO001": PurchaseOrder(
-                po_id="PO001",
-                vendor_id="V001",
-                approved_amount=5000,
-                approved=True,
-            )
-        }
+        invoice = scenario["invoice"]
+        vendor = scenario["vendor"]
+        purchase_order = scenario["purchase_order"]
+        payments = scenario["payments"]
 
         self.invoices = {
-            "INV001": Invoice(
-                invoice_id="INV001",
-                vendor_id="V001",
-                po_id="PO001",
-                amount=5000,
-            )
+            invoice.invoice_id: invoice
         }
 
-        self.payments = {}
+        self.vendors = {
+            vendor.vendor_id: vendor
+        }
+
+        self.purchase_orders = (
+            {purchase_order.po_id: purchase_order}
+            if purchase_order is not None
+            else {}
+        )
+
+        self.payments = {
+            payment.payment_id: payment
+            for payment in payments
+        }
 
         self.decisions = []
